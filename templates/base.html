@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$pagetitle</title>
+<link rel="stylesheet" href="${root}assets/style.css">
+</head>
+<body>
+<header class="site-nav">
+  <a class="site-name" href="${root}index.html">$sitetitle</a>
+  <nav class="nav-links">
+    <a href="${root}index.html">目录</a>
+    <a href="${root}$firstextra">番外</a>
+    <a href="${root}settings.html">设定</a>
+    <a href="#footer">关于</a>
+  </nav>
+</header>
+<main>
+$content
+</main>
+<footer id="footer" class="site-foot">
+  <p class="foot-line">$footline</p>
+  <p class="foot-meta">本页面由 build.py 自动生成</p>
+</footer>
+</body>
+</html>
