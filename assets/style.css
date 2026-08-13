@@ -120,6 +120,16 @@ main {
   margin-bottom: 10px;
 }
 .toc-head-extra { margin-top: 28px; }
+.site-status {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 1px 8px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 10px;
+  letter-spacing: 4px;
+  vertical-align: middle;
+}
 .toc-list { list-style: none; }
 .toc-item a {
   display: flex;
@@ -149,18 +159,28 @@ main {
 }
 .reading-title {
   font-size: 24px;
+  font-weight: 600;
   letter-spacing: 4px;
   margin-bottom: 28px;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--line);
 }
+.reading-meta {
+  font-size: 12.5px;
+  letter-spacing: 3px;
+  color: var(--ink-soft);
+  margin: -20px 0 28px;
+}
 .reading-body {
   max-width: 680px;
   margin: 0 auto;
+  /* 正文无衬线：中文长文在屏幕上更清晰；宋体留给标题与装饰 */
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   font-size: 17px;
-  line-height: 1.9;
+  line-height: 1.75;
 }
-.reading-body p { margin-bottom: 1.4em; text-indent: 2em; }
+.reading-body p { margin-bottom: 1.2em; text-indent: 2em; }
 .reading-body p.first { text-indent: 0; }
 .reading-body p.first::first-letter {
   font-size: 3.2em;
@@ -189,6 +209,7 @@ main {
 /* 设定页 */
 .settings-title {
   font-size: 24px;
+  font-weight: 600;
   letter-spacing: 4px;
   margin-bottom: 10px;
 }
@@ -196,6 +217,10 @@ main {
   color: var(--ink-soft);
   font-size: 13px;
   margin-bottom: 30px;
+}
+.settings-body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 }
 .settings-body h2 {
   font-size: 18px;
@@ -206,7 +231,7 @@ main {
 .settings-body p {
   margin-bottom: 1em;
   font-size: 15.5px;
-  line-height: 1.85;
+  line-height: 1.75;
 }
 .settings-body ul, .settings-body ol {
   margin: 0 0 1em 1.6em;
@@ -239,6 +264,13 @@ main {
   color: var(--ink-soft);
   opacity: .6;
   margin-top: 8px;
+  letter-spacing: 1px;
+}
+.foot-copy {
+  font-size: 10px;
+  color: var(--ink-soft);
+  opacity: .6;
+  margin-top: 4px;
   letter-spacing: 1px;
 }
 

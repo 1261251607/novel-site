@@ -8,6 +8,7 @@
 零依赖：仅 Python 3.9+ 标准库。
 """
 import argparse
+import datetime
 import html
 import json
 import re
@@ -286,6 +287,8 @@ def build(manifest, root, out_dir=None, templates_dir=None):
         "tagline": _escape(site["tagline"]),
         "author": _escape(site.get("author", "")),
         "footline": _escape(site.get("footline", "")),
+        "status": _escape(site.get("status", "")),
+        "year": str(datetime.date.today().year),
         "seal": site["title"][0],
         "firstextra": f"extras/{first_extra_id}.html" if first_extra_id else "",
     }
@@ -303,7 +306,9 @@ def build(manifest, root, out_dir=None, templates_dir=None):
         items = manifest[group]
         for i, item in enumerate(items):
             src = root / "content" / group / f"{item['id']}.txt"
-            paragraphs = parse_txt(src.read_text(encoding="utf-8"))
+            raw = src.read_text(encoding="utf-8")
+            paragraphs = parse_txt(raw)
+            wordcount = len(re.sub(r"\s", "", raw))
             body = "\n".join(
                 f'<p class="first">{_escape(p)}</p>' if k == 0 else f"<p>{_escape(p)}</p>"
                 for k, p in enumerate(paragraphs)
@@ -322,6 +327,7 @@ def build(manifest, root, out_dir=None, templates_dir=None):
                 templates_dir, "chapter.html",
                 grouplabel="正篇" if group == "chapters" else "番外",
                 title=_escape(item["title"]),
+                wordcount=str(wordcount),
                 body=body, prev=prev_html, next=next_html,
                 root="../",
             )

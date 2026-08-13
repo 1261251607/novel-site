@@ -18,6 +18,7 @@ def make_manifest():
             "tagline": "测试标语",
             "author": "",
             "footline": "测试页脚",
+            "status": "连载中",
         },
         "chapters": [
             {"id": "1-1", "title": "第一章 · 第一节", "source": "01.txt"},
@@ -169,6 +170,14 @@ class TestBuild(unittest.TestCase):
         self.assertIn('href="chapters/1-1.html"', home)
         self.assertIn('href="extras/jing.html"', home)
         self.assertIn("壹", home)
+        self.assertIn("连载中", home)
+
+    def test_chapter_shows_wordcount(self):
+        out = build.build(self.manifest, self.root, templates_dir=REPO / "templates")
+        first = (out / "chapters/1-1.html").read_text(encoding="utf-8")
+        self.assertIn("全文约", first)
+        # 正文 14 字（两段各 7 字，去空白）
+        self.assertIn("14 字", first)
 
     def test_settings_public_filter(self):
         out = build.build(self.manifest, self.root, templates_dir=REPO / "templates")
