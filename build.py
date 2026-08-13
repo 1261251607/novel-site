@@ -280,6 +280,9 @@ def build(manifest, root, out_dir=None, templates_dir=None):
     dst_assets = out_dir / "assets"
     dst_assets.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(root / "assets" / "style.css", dst_assets / "style.css")
+    img_src = root / "assets" / "img"
+    if img_src.is_dir():
+        shutil.copytree(img_src, dst_assets / "img", dirs_exist_ok=True)
 
     first_extra_id = manifest["extras"][0]["id"] if manifest["extras"] else ""
     ctx = {

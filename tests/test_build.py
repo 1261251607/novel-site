@@ -136,6 +136,8 @@ class TestBuild(unittest.TestCase):
         )
         (self.root / "assets").mkdir()
         (self.root / "assets/style.css").write_text("/* css */", encoding="utf-8")
+        (self.root / "assets/img").mkdir()
+        (self.root / "assets/img/censer.webp").write_bytes(b"img")
         self.manifest = make_manifest()
 
     def tearDown(self):
@@ -149,6 +151,7 @@ class TestBuild(unittest.TestCase):
         self.assertTrue((out / "extras/jing.html").is_file())
         self.assertTrue((out / "settings.html").is_file())
         self.assertTrue((out / "assets/style.css").is_file())
+        self.assertTrue((out / "assets/img/censer.webp").is_file())
 
     def test_chapter_renders_paragraphs_and_prev_next(self):
         out = build.build(self.manifest, self.root, templates_dir=REPO / "templates")
@@ -185,7 +188,10 @@ class TestBuild(unittest.TestCase):
         self.assertIn("home-grid", home)
         self.assertIn("香火是记你的账", home)
         self.assertIn("天是死的", home)
-        self.assertIn("side-drawing", home)
+        self.assertIn("side-img", home)
+        self.assertIn("censer.webp", home)
+        self.assertIn("sun.webp", home)
+        self.assertIn("well.webp", home)
         self.assertIn('main class="home-page"', home)
 
     def test_settings_public_filter(self):

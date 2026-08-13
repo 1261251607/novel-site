@@ -173,8 +173,18 @@ main {
   letter-spacing: 8px;
   color: var(--ink-soft);
 }
-.side-drawing { width: 54px; color: var(--ink-soft); }
-.side-drawing .sun-disc { color: var(--accent); }
+.side-img {
+  width: 76px;
+  height: auto;
+  /* 白底图乘进纸面：白消失，墨线留在纸上 */
+  mix-blend-mode: multiply;
+  filter: grayscale(1);
+}
+[data-theme="a"] .side-img {
+  /* 暗色主题：反转后以 screen 融入暗底，墨线变亮 */
+  mix-blend-mode: screen;
+  filter: grayscale(1) invert(1);
+}
 
 @media (max-width: 1000px) {
   .home-page { max-width: 760px; }
