@@ -144,6 +144,107 @@ def sync_content(manifest, root, draft_dir=None):
     return count + 1
 
 
+# ---------------------------------------------------------------- 自动维护 manifest
+
+_CN_DIGITS = {"零": 0, "一": 1, "二": 2, "三": 3, "四": 4,
+              "五": 5, "六": 6, "七": 7, "八": 8, "九": 9}
+
+
+def cn_to_int(s):
+    """中文数字 → 整数，支持 一 到 九千九百九十九（章节编号用）。"""
+    total, num = 0, 0
+    for ch in s:
+        if ch in _CN_DIGITS:
+            num = _CN_DIGITS[ch]
+        elif ch in ("十", "百", "千"):
+            unit = {"十": 10, "百": 100, "千": 1000}[ch]
+            total += (num if num else 1) * unit
+            num = 0
+        else:
+            raise ValueError(f"无法解析的中文数字：{s}")
+    return total + num
+
+
+_CHAPTER_RE = re.compile(
+    r"^\d{8}-(第[零一二三四五六七八九十百千]+章)"
+    r"(第[零一二三四五六七八九十百千]+节)\.txt$")
+
+
+def parse_chapter_filename(name):
+    """'20260812-第二章第一节.txt' → (2, 1, '第二章 · 第一节')；不匹配返回 None。"""
+    m = _CHAPTER_RE.match(name)
+    if not m:
+        return None
+    try:
+        cn = cn_to_int(m.group(1)[1:-1])
+        sn = cn_to_int(m.group(2)[1:-1])
+    except ValueError:
+        return None
+    return cn, sn, f"{m.group(1)} · {m.group(2)}"
+
+
+_EXTRA_RE = re.compile(r"^(\d{8})-番外-(.+)\.txt$")
+
+
+def parse_extra_filename(name):
+    """'20260811-番外-石像.txt' → ('20260811', '石像', '番外《石像》')；不匹配返回 None。"""
+    m = _EXTRA_RE.match(name)
+    if not m:
+        return None
+    return m.group(1), m.group(2), f"番外《{m.group(2)}》"
+
+
+def update_manifest(manifest, draft_dir):
+    """按草稿目录维护 manifest 的章节/番外条目。
+
+    - 新增：未收录且命名规范的 txt 自动加条目（章节按章/节号排序，番外按日期排序）
+    - 清理：源文件已不存在的条目移除
+    - 忽略：命名不规范的 txt 不收，报给调用方提醒
+    返回 (added, pruned, ignored) 三个列表。幂等。
+    """
+    draft_dir = Path(draft_dir)
+    listed = {item["source"] for g in ("chapters", "extras")
+              for item in manifest[g]}
+    added, pruned, ignored = [], [], []
+
+    for group in ("chapters", "extras"):
+        kept = []
+        for item in manifest[group]:
+            if (draft_dir / item["source"]).is_file():
+                kept.append(item)
+            else:
+                pruned.append(item["title"])
+        manifest[group] = kept
+
+    for p in sorted(draft_dir.glob("*.txt")):
+        name = p.name
+        if name in listed or name.endswith(".bak") or "合集" in name:
+            continue
+        if name == manifest.get("settings_source", ""):
+            continue
+        ch = parse_chapter_filename(name)
+        if ch:
+            cn, sn, title = ch
+            manifest["chapters"].append(
+                {"id": f"{cn}-{sn}", "title": title, "source": name})
+            added.append(title)
+            continue
+        ex = parse_extra_filename(name)
+        if ex:
+            _, key, title = ex
+            manifest["extras"].append(
+                {"id": key, "title": title, "source": name})
+            added.append(title)
+            continue
+        ignored.append(name)
+
+    manifest["chapters"].sort(
+        key=lambda it: (parse_chapter_filename(it["source"]) or (10 ** 6, 10 ** 6, ""))[:2])
+    manifest["extras"].sort(
+        key=lambda it: (parse_extra_filename(it["source"]) or ("", "", ""))[:2])
+    return added, pruned, ignored
+
+
 _NUMERALS = "零壹贰叁肆伍陆柒捌玖拾"
 
 
@@ -272,11 +373,26 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="克系小说展示站构建脚本")
     parser.add_argument("--sync", action="store_true",
                         help="先把草稿同步到 content/ 再构建")
+    parser.add_argument("--autoupdate", action="store_true",
+                        help="按草稿目录自动维护 manifest（新增/清理章节番外条目）")
     parser.add_argument("--out-dir", default=None,
                         help="输出目录（默认 _site/）")
     args = parser.parse_args(argv)
 
-    manifest = load_manifest(ROOT / "manifest.json")
+    manifest_path = ROOT / "manifest.json"
+    manifest = load_manifest(manifest_path)
+    if args.autoupdate:
+        added, pruned, ignored = update_manifest(
+            manifest, (ROOT / manifest["draft_dir"]).resolve())
+        manifest_path.write_text(
+            json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8")
+        for t in added:
+            print(f"✓ 新增条目：{t}")
+        for t in pruned:
+            print(f"✗ 移除条目（源稿缺失）：{t}")
+        for n in ignored:
+            print(f"⚠️  未收录（命名不识别）：{n}")
     if args.sync:
         n = sync_content(manifest, ROOT)
         print(f"已同步 {n} 个文件")

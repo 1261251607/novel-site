@@ -182,5 +182,71 @@ class TestBuild(unittest.TestCase):
         self.assertIn("../index.html", page)
 
 
+class TestManifestAutoupdate(unittest.TestCase):
+    def test_cn_to_int(self):
+        cases = {"一": 1, "十": 10, "十二": 12, "二十": 20, "二十一": 21,
+                 "一百零三": 103}
+        for s, want in cases.items():
+            self.assertEqual(build.cn_to_int(s), want)
+
+    def test_parse_chapter_filename(self):
+        self.assertEqual(
+            build.parse_chapter_filename("20260812-第二章第一节.txt"),
+            (2, 1, "第二章 · 第一节"))
+        self.assertIsNone(build.parse_chapter_filename("20260811-番外-井.txt"))
+        self.assertIsNone(build.parse_chapter_filename("20260811-第一章合集.txt"))
+
+    def test_parse_extra_filename(self):
+        self.assertEqual(
+            build.parse_extra_filename("20260811-番外-石像.txt"),
+            ("20260811", "石像", "番外《石像》"))
+        self.assertIsNone(build.parse_extra_filename("20260812-第二章第一节.txt"))
+
+    def test_update_manifest_adds_sorts_and_prunes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            drafts = root / "drafts"
+            drafts.mkdir()
+            for n in ("20260811-第一章第一节.txt", "20260811-第一章第二节.txt",
+                      "20260811-番外-井.txt", "settings.md",
+                      "20260812-第二章第一节.txt", "20260811-番外-石像.txt",
+                      "20260811-第一章合集.txt", "未命名稿.txt", "x.txt.bak"):
+                (drafts / n).write_text("内容", encoding="utf-8")
+            manifest = {
+                "draft_dir": "../drafts",
+                "site": {
+                    "title": "测试书名", "tagline": "测试标语",
+                    "author": "", "footline": "测试页脚",
+                },
+                "chapters": [
+                    {"id": "1-1", "title": "第一章 · 第一节",
+                     "source": "20260811-第一章第一节.txt"},
+                    {"id": "1-2", "title": "第一章 · 第二节",
+                     "source": "20260811-第一章第二节.txt"},
+                ],
+                "extras": [
+                    {"id": "jing", "title": "番外《井》",
+                     "source": "20260811-番外-井.txt"},
+                ],
+                "settings_source": "settings.md",
+                "settings_public": ["一句话概括"],
+            }
+            (drafts / "20260811-第一章第二节.txt").unlink()  # 模拟源稿被删
+            added, pruned, ignored = build.update_manifest(manifest, drafts)
+            self.assertIn("第二章 · 第一节", added)
+            self.assertIn("番外《石像》", added)
+            self.assertEqual(pruned, ["第一章 · 第二节"])
+            self.assertEqual(ignored, ["未命名稿.txt"])
+            chapters = manifest["chapters"]
+            self.assertEqual([c["id"] for c in chapters], ["1-1", "2-1"])
+            self.assertEqual([c["title"] for c in chapters],
+                             ["第一章 · 第一节", "第二章 · 第一节"])
+            extras = manifest["extras"]
+            self.assertEqual([e["id"] for e in extras], ["jing", "石像"])
+            # 幂等：再跑一遍不应重复添加
+            added2, _, _ = build.update_manifest(manifest, drafts)
+            self.assertEqual(added2, [])
+
+
 if __name__ == "__main__":
     unittest.main()
