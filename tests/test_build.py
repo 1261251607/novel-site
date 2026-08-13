@@ -39,5 +39,18 @@ class TestLoadManifest(unittest.TestCase):
             self.assertEqual(build.load_manifest(path), {"a": 1, "b": [2, 3]})
 
 
+class TestParseTxt(unittest.TestCase):
+    def test_blank_line_separates_paragraphs(self):
+        text = "第一段。\n\n第二段。\n\n\n第三段。"
+        self.assertEqual(build.parse_txt(text), ["第一段。", "第二段。", "第三段。"])
+
+    def test_internal_newlines_are_joined(self):
+        text = "第一段\n续行。\n\n第二段。"
+        self.assertEqual(build.parse_txt(text), ["第一段续行。", "第二段。"])
+
+    def test_empty_text_gives_no_paragraphs(self):
+        self.assertEqual(build.parse_txt(""), [])
+
+
 if __name__ == "__main__":
     unittest.main()

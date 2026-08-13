@@ -17,3 +17,16 @@ def load_manifest(path):
     """读取 manifest.json 并返回 dict。"""
     with open(path, encoding="utf-8") as f:
         return json.load(f)
+
+
+def parse_txt(text):
+    """txt 正文 → 段落列表。
+
+    规则：空行分段；段内换行直接合并（中文断行不产生空格）。
+    """
+    paragraphs = []
+    for block in text.split("\n\n"):
+        block = block.replace("\n", "").strip()
+        if block:
+            paragraphs.append(block)
+    return paragraphs
