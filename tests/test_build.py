@@ -117,5 +117,70 @@ class TestSync(unittest.TestCase):
                 build.sync_content(manifest, root, draft_dir=root / "drafts")
 
 
+class TestBuild(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        content = self.root / "content"
+        (content / "chapters").mkdir(parents=True)
+        (content / "extras").mkdir(parents=True)
+        (content / "chapters/1-1.txt").write_text(
+            "第一节第一段。\n\n第一节第二段。", encoding="utf-8")
+        (content / "chapters/1-2.txt").write_text("第二节正文。", encoding="utf-8")
+        (content / "extras/jing.txt").write_text("井的正文。", encoding="utf-8")
+        (content / "settings.md").write_text(
+            "# 设定文档\n\n## 一句话概括\n\n这是公开的一句话。\n\n"
+            "## 时间线\n\n这是秘密时间线。",
+            encoding="utf-8",
+        )
+        (self.root / "assets").mkdir()
+        (self.root / "assets/style.css").write_text("/* css */", encoding="utf-8")
+        self.manifest = make_manifest()
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_build_generates_all_pages(self):
+        out = build.build(self.manifest, self.root, templates_dir=REPO / "templates")
+        self.assertTrue((out / "index.html").is_file())
+        self.assertTrue((out / "chapters/1-1.html").is_file())
+        self.assertTrue((out / "chapters/1-2.html").is_file())
+        self.assertTrue((out / "extras/jing.html").is_file())
+        self.assertTrue((out / "settings.html").is_file())
+        self.assertTrue((out / "assets/style.css").is_file())
+
+    def test_chapter_renders_paragraphs_and_prev_next(self):
+        out = build.build(self.manifest, self.root, templates_dir=REPO / "templates")
+        first = (out / "chapters/1-1.html").read_text(encoding="utf-8")
+        self.assertIn("第一节第一段。", first)
+        self.assertIn('class="first"', first)
+        self.assertIn("已是开头", first)
+        self.assertIn('href="1-2.html"', first)
+        second = (out / "chapters/1-2.html").read_text(encoding="utf-8")
+        self.assertIn("第二节正文。", second)
+        self.assertIn('href="1-1.html"', second)
+        self.assertIn("已是结尾", second)
+
+    def test_home_lists_chapters_and_extras(self):
+        out = build.build(self.manifest, self.root, templates_dir=REPO / "templates")
+        home = (out / "index.html").read_text(encoding="utf-8")
+        self.assertIn("第一章 · 第一节", home)
+        self.assertIn("番外《井》", home)
+        self.assertIn('href="chapters/1-1.html"', home)
+        self.assertIn('href="extras/jing.html"', home)
+        self.assertIn("壹", home)
+
+    def test_settings_public_filter(self):
+        out = build.build(self.manifest, self.root, templates_dir=REPO / "templates")
+        page = (out / "settings.html").read_text(encoding="utf-8")
+        self.assertIn("这是公开的一句话。", page)
+        self.assertNotIn("秘密时间线", page)
+
+    def test_chapter_nav_links_back_to_index(self):
+        out = build.build(self.manifest, self.root, templates_dir=REPO / "templates")
+        page = (out / "chapters/1-1.html").read_text(encoding="utf-8")
+        self.assertIn("../index.html", page)
+
+
 if __name__ == "__main__":
     unittest.main()

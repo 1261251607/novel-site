@@ -7,9 +7,11 @@
 
 零依赖：仅 Python 3.9+ 标准库。
 """
+import html
 import json
 import re
 import shutil
+import string
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -139,3 +141,127 @@ def sync_content(manifest, root, draft_dir=None):
         raise FileNotFoundError(f"设定文档缺失：{src}")
     shutil.copyfile(src, root / "content" / "settings.md")
     return count + 1
+
+
+_NUMERALS = "零壹贰叁肆伍陆柒捌玖拾"
+
+
+def _numeral(n):
+    """1-99 的汉字数字（目录序号用）。"""
+    if n <= 10:
+        return _NUMERALS[n]
+    if n < 20:
+        return "拾" + _NUMERALS[n - 10]
+    return _NUMERALS[n // 10] + "拾" + (_NUMERALS[n % 10] if n % 10 else "")
+
+
+def _escape(s):
+    return html.escape(s, quote=False)
+
+
+def render_template(templates_dir, name, **ctx):
+    """渲染 string.Template 模板文件。"""
+    tpl = string.Template(
+        (Path(templates_dir) / name).read_text(encoding="utf-8"))
+    return tpl.substitute(**ctx)
+
+
+def build(manifest, root, out_dir=None, templates_dir=None):
+    """渲染全站到 out_dir（默认 <root>/_site）。返回 out_dir。"""
+    root = Path(root)
+    out_dir = Path(out_dir) if out_dir else root / "_site"
+    templates_dir = Path(templates_dir) if templates_dir else root / "templates"
+    site = manifest["site"]
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    dst_assets = out_dir / "assets"
+    dst_assets.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(root / "assets" / "style.css", dst_assets / "style.css")
+
+    first_extra_id = manifest["extras"][0]["id"] if manifest["extras"] else ""
+    ctx = {
+        "sitetitle": _escape(site["title"]),
+        "tagline": _escape(site["tagline"]),
+        "author": _escape(site.get("author", "")),
+        "footline": _escape(site.get("footline", "")),
+        "seal": site["title"][0],
+        "firstextra": f"extras/{first_extra_id}.html" if first_extra_id else "",
+    }
+
+    def render_page(name, content, root_prefix, pagetitle):
+        page = render_template(
+            templates_dir, "base.html",
+            root=root_prefix, pagetitle=pagetitle, content=content, **ctx)
+        target = out_dir / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(page, encoding="utf-8")
+
+    # 章节与番外
+    for group in ("chapters", "extras"):
+        items = manifest[group]
+        for i, item in enumerate(items):
+            src = root / "content" / group / f"{item['id']}.txt"
+            paragraphs = parse_txt(src.read_text(encoding="utf-8"))
+            body = "\n".join(
+                f'<p class="first">{_escape(p)}</p>' if k == 0 else f"<p>{_escape(p)}</p>"
+                for k, p in enumerate(paragraphs)
+            )
+            if i > 0:
+                prev_html = (f'<a href="{items[i - 1]["id"]}.html">'
+                             f'← {_escape(items[i - 1]["title"])}</a>')
+            else:
+                prev_html = '<span class="pager-off">已是开头</span>'
+            if i < len(items) - 1:
+                next_html = (f'<a href="{items[i + 1]["id"]}.html">'
+                             f'{_escape(items[i + 1]["title"])} →</a>')
+            else:
+                next_html = '<span class="pager-off">已是结尾</span>'
+            content = render_template(
+                templates_dir, "chapter.html",
+                grouplabel="正篇" if group == "chapters" else "番外",
+                title=_escape(item["title"]),
+                body=body, prev=prev_html, next=next_html,
+                root="../",
+            )
+            render_page(f"{group}/{item['id']}.html", content, "../",
+                        f"{item['title']} · {site['title']}")
+
+    # 设定页（只渲染 settings_public 清单中的条目）
+    settings_md = (root / "content" / "settings.md").read_text(encoding="utf-8")
+    sections = parse_markdown_sections(settings_md)
+    public = set(manifest.get("settings_public", []))
+    parts = []
+    for s in sections:
+        if s["title"] not in public:
+            continue
+        level = min(s["level"], 2)
+        parts.append(
+            f'<h{level} class="setting-title">{_escape(s["title"])}</h{level}>'
+            + "\n" + render_markdown_body(s["body"])
+        )
+    settings_content = render_template(
+        templates_dir, "settings.html",
+        sections="\n".join(parts) if parts else "<p>设定尚未公开，敬请期待。</p>",
+        root="",
+    )
+    render_page("settings.html", settings_content, "",
+                f"设定 · {site['title']}")
+
+    # 首页
+    chapters_html = "\n".join(
+        f'<li class="toc-item"><a href="chapters/{item["id"]}.html">'
+        f'<span class="toc-no">{_numeral(k + 1)}</span>'
+        f'<span class="toc-name">{_escape(item["title"])}</span></a></li>'
+        for k, item in enumerate(manifest["chapters"])
+    )
+    extras_html = "\n".join(
+        f'<li class="toc-item extra"><a href="extras/{item["id"]}.html">'
+        f'<span class="toc-name">{_escape(item["title"])}</span></a></li>'
+        for item in manifest["extras"]
+    )
+    home_content = render_template(
+        templates_dir, "home.html",
+        chapters=chapters_html, extras=extras_html, root="", **ctx,
+    )
+    render_page("index.html", home_content, "", site["title"])
+    return out_dir
