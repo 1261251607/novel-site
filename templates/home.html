@@ -1,12 +1,55 @@
-<section class="hero">
-  <div class="seal">$seal</div>
-  <h1 class="hero-title">$sitetitle</h1>
-  <p class="hero-tag">$tagline</p>
-  <p class="hero-sub">—— 门内纪事 · 永昌二年</p>
-</section>
-<section class="toc">
-  <h2 class="toc-head">正篇<span class="site-status">$status</span></h2>
-  <ul class="toc-list">$chapters</ul>
-  <h2 class="toc-head toc-head-extra">番外</h2>
-  <ul class="toc-list toc-list-extra">$extras</ul>
-</section>
+<div class="home-grid">
+  <aside class="side side-left" aria-hidden="true">
+    <p class="side-verse">香火是记你的账</p>
+    <svg class="side-drawing" viewBox="0 0 60 220" role="presentation">
+      <!-- 三炷香：无风世界，烟是笔直的 -->
+      <g stroke="currentColor" stroke-width="1.2" fill="none">
+        <line x1="22" y1="168" x2="22" y2="66" opacity=".75"/>
+        <line x1="38" y1="168" x2="38" y2="66" opacity=".75"/>
+        <line x1="30" y1="168" x2="30" y2="30"/>
+      </g>
+      <!-- 香炉 -->
+      <path d="M14 178 q16 -14 32 0 l-2 12 h-28 z" fill="currentColor" opacity=".3"/>
+      <path d="M14 178 q16 -14 32 0" stroke="currentColor" stroke-width="1.2" fill="none"/>
+      <path d="M10 176 q-7 3 -5 12 M50 176 q7 3 5 12" stroke="currentColor" stroke-width="1.2" fill="none"/>
+      <!-- 炉足 -->
+      <path d="M22 190 v8 M38 190 v8" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+  </aside>
+
+  <div class="home-core">
+    <section class="hero">
+      <div class="seal">$seal</div>
+      <h1 class="hero-title">$sitetitle</h1>
+      <p class="hero-tag">$tagline</p>
+      <p class="hero-sub">—— 门内纪事 · 永昌二年</p>
+    </section>
+    <section class="toc">
+      <h2 class="toc-head">正篇<span class="site-status">$status</span></h2>
+      <ul class="toc-list">$chapters</ul>
+      <h2 class="toc-head toc-head-extra">番外</h2>
+      <ul class="toc-list toc-list-extra">$extras</ul>
+    </section>
+  </div>
+
+  <aside class="side side-right" aria-hidden="true">
+    <p class="side-verse">天是死的</p>
+    <svg class="side-drawing" viewBox="0 0 60 60" role="presentation">
+      <!-- 钉在天上的太阳：日轮 + 钉帽 -->
+      <circle class="sun-disc" cx="30" cy="32" r="15" fill="currentColor" opacity=".25"/>
+      <circle cx="30" cy="32" r="15" stroke="currentColor" stroke-width="1.2" fill="none"/>
+      <circle cx="30" cy="32" r="22" stroke="currentColor" stroke-width="1" stroke-dasharray="1 5" fill="none" opacity=".6"/>
+      <!-- 钉帽 -->
+      <line x1="30" y1="17" x2="30" y2="8" stroke="currentColor" stroke-width="1.2"/>
+      <path d="M24 12 h12" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+    <svg class="side-drawing" viewBox="0 0 60 60" role="presentation">
+      <!-- 井口：番外《井》 -->
+      <circle cx="30" cy="28" r="15" stroke="currentColor" stroke-width="1.2" fill="none"/>
+      <circle cx="30" cy="28" r="20" stroke="currentColor" stroke-width="1" opacity=".4" fill="none"/>
+      <!-- 井绳垂入深处 -->
+      <line x1="30" y1="13" x2="30" y2="26" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="30" cy="32" r="1.6" fill="currentColor" opacity=".6"/>
+    </svg>
+  </aside>
+</div>

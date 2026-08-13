@@ -179,6 +179,15 @@ class TestBuild(unittest.TestCase):
         # 正文 14 字（两段各 7 字，去空白）
         self.assertIn("14 字", first)
 
+    def test_home_has_side_decorations(self):
+        out = build.build(self.manifest, self.root, templates_dir=REPO / "templates")
+        home = (out / "index.html").read_text(encoding="utf-8")
+        self.assertIn("home-grid", home)
+        self.assertIn("香火是记你的账", home)
+        self.assertIn("天是死的", home)
+        self.assertIn("side-drawing", home)
+        self.assertIn('main class="home-page"', home)
+
     def test_settings_public_filter(self):
         out = build.build(self.manifest, self.root, templates_dir=REPO / "templates")
         page = (out / "settings.html").read_text(encoding="utf-8")

@@ -149,6 +149,39 @@ main {
 }
 .toc-list-extra .toc-name { color: var(--accent); }
 
+/* 首页装饰边栏（仅宽屏显示） */
+.home-page { max-width: 1160px; }
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 660px) 1fr;
+  gap: 32px;
+  align-items: start;
+}
+.side {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding-top: 20px;
+  opacity: .85;
+}
+.side-verse {
+  writing-mode: vertical-rl;
+  font-size: 13px;
+  letter-spacing: 8px;
+  color: var(--ink-soft);
+}
+.side-drawing { width: 54px; color: var(--ink-soft); }
+.side-drawing .sun-disc { color: var(--accent); }
+
+@media (max-width: 1000px) {
+  .home-page { max-width: 760px; }
+  .home-grid { grid-template-columns: 1fr; }
+  .side { display: none; }
+}
+
 /* 阅读页 */
 .reading { padding-top: 8px; }
 .reading-label {

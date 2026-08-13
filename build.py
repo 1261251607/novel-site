@@ -293,10 +293,11 @@ def build(manifest, root, out_dir=None, templates_dir=None):
         "firstextra": f"extras/{first_extra_id}.html" if first_extra_id else "",
     }
 
-    def render_page(name, content, root_prefix, pagetitle):
+    def render_page(name, content, root_prefix, pagetitle, mainclass=""):
         page = render_template(
             templates_dir, "base.html",
-            root=root_prefix, pagetitle=pagetitle, content=content, **ctx)
+            root=root_prefix, pagetitle=pagetitle, content=content,
+            mainclass=mainclass, **ctx)
         target = out_dir / name
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(page, encoding="utf-8")
@@ -371,7 +372,8 @@ def build(manifest, root, out_dir=None, templates_dir=None):
         templates_dir, "home.html",
         chapters=chapters_html, extras=extras_html, root="", **ctx,
     )
-    render_page("index.html", home_content, "", site["title"])
+    render_page("index.html", home_content, "", site["title"],
+                mainclass="home-page")
     return out_dir
 
 
