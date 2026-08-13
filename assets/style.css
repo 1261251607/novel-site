@@ -1,0 +1,248 @@
+/* 克系小说展示站样式 · 双主题
+   B「泛黄手稿」为默认（:root），A「深渊暗黑」为备用（[data-theme="a"]）。
+   切换器后置；两套配色已用 CSS 变量就位。 */
+
+:root {
+  /* B · 泛黄手稿 */
+  --paper: #e7dcc0;
+  --ink: #33291a;
+  --ink-soft: #6d5a36;
+  --accent: #8c2f2f;
+  --line: #a08c62;
+  --seal-bg: #8c2f2f;
+  --seal-ink: #e7dcc0;
+}
+
+[data-theme="a"] {
+  /* A · 深渊暗黑 */
+  --paper: #0b0d10;
+  --ink: #cfc8b8;
+  --ink-soft: #8d8574;
+  --accent: #c9a96a;
+  --line: #2a2e35;
+  --seal-bg: #c9a96a;
+  --seal-ink: #0b0d10;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Songti SC", "STSong", "Noto Serif CJK SC", Georgia, serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-image:
+    radial-gradient(ellipse at 18% 8%, rgba(120, 90, 40, .10), transparent 60%),
+    radial-gradient(ellipse at 85% 92%, rgba(120, 90, 40, .12), transparent 55%);
+  background-attachment: fixed;
+}
+
+[data-theme="a"] body {
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(201, 169, 106, .06), transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(60, 40, 20, .25), transparent 60%);
+}
+
+/* 导航 */
+.site-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 18px 28px 12px;
+  border-bottom: 1px solid var(--line);
+  margin: 0 20px;
+}
+.site-name {
+  font-size: 15px;
+  letter-spacing: 6px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.nav-links a {
+  margin-left: 18px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  letter-spacing: 2px;
+}
+.nav-links a:hover { color: var(--accent); }
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 28px 64px;
+}
+
+/* 首页 hero */
+.hero { text-align: center; position: relative; padding: 30px 0 10px; }
+.seal {
+  position: absolute;
+  top: 26px;
+  right: 8px;
+  width: 44px;
+  height: 44px;
+  background: var(--seal-bg);
+  color: var(--seal-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  transform: rotate(-6deg);
+  opacity: .85;
+}
+.hero-title {
+  writing-mode: vertical-rl;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 12px;
+  margin: 0 auto 10px;
+}
+.hero-tag { font-size: 14px; line-height: 1.9; }
+.hero-sub {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 8px;
+  letter-spacing: 2px;
+}
+
+/* 目录 */
+.toc { margin-top: 36px; }
+.toc-head {
+  font-size: 13px;
+  letter-spacing: 6px;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+.toc-head-extra { margin-top: 28px; }
+.toc-list { list-style: none; }
+.toc-item a {
+  display: flex;
+  align-items: baseline;
+  padding: 10px 4px;
+  border-bottom: 1px dotted var(--line);
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 16px;
+}
+.toc-item a:hover { color: var(--accent); }
+.toc-no {
+  color: var(--ink-soft);
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-right: 14px;
+}
+.toc-list-extra .toc-name { color: var(--accent); }
+
+/* 阅读页 */
+.reading { padding-top: 8px; }
+.reading-label {
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+.reading-title {
+  font-size: 24px;
+  letter-spacing: 4px;
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.reading-body {
+  max-width: 680px;
+  margin: 0 auto;
+  font-size: 17px;
+  line-height: 1.9;
+}
+.reading-body p { margin-bottom: 1.4em; text-indent: 2em; }
+.reading-body p.first { text-indent: 0; }
+.reading-body p.first::first-letter {
+  font-size: 3.2em;
+  float: left;
+  line-height: 1;
+  padding: 6px 10px 0 0;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* 翻页 */
+.pager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 44px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+.pager a { color: var(--ink); text-decoration: none; }
+.pager a:hover { color: var(--accent); }
+.pager-off { color: var(--ink-soft); opacity: .5; }
+.pager-toc { letter-spacing: 3px; }
+
+/* 设定页 */
+.settings-title {
+  font-size: 24px;
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+}
+.settings-note {
+  color: var(--ink-soft);
+  font-size: 13px;
+  margin-bottom: 30px;
+}
+.settings-body h2 {
+  font-size: 18px;
+  margin: 26px 0 12px;
+  letter-spacing: 2px;
+}
+.settings-body h3 { font-size: 16px; margin: 20px 0 8px; }
+.settings-body p {
+  margin-bottom: 1em;
+  font-size: 15.5px;
+  line-height: 1.85;
+}
+.settings-body ul, .settings-body ol {
+  margin: 0 0 1em 1.6em;
+  font-size: 15.5px;
+  line-height: 1.85;
+}
+.settings-body blockquote {
+  margin: 0 0 1em;
+  padding: 8px 16px;
+  border-left: 3px solid var(--accent);
+  color: var(--ink-soft);
+  font-size: 14.5px;
+}
+.settings-body strong { color: var(--accent); }
+
+/* 页脚 */
+.site-foot {
+  text-align: center;
+  padding: 26px 0 30px;
+  border-top: 1px solid var(--line);
+  margin: 0 20px;
+}
+.foot-line {
+  font-size: 12px;
+  letter-spacing: 6px;
+  color: var(--ink-soft);
+}
+.foot-meta {
+  font-size: 10px;
+  color: var(--ink-soft);
+  opacity: .6;
+  margin-top: 8px;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 560px) {
+  .site-nav { flex-direction: column; gap: 8px; }
+  .reading-body { font-size: 16px; }
+}
