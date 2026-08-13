@@ -7,6 +7,7 @@
 
 零依赖：仅 Python 3.9+ 标准库。
 """
+import argparse
 import html
 import json
 import re
@@ -265,3 +266,23 @@ def build(manifest, root, out_dir=None, templates_dir=None):
     )
     render_page("index.html", home_content, "", site["title"])
     return out_dir
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="克系小说展示站构建脚本")
+    parser.add_argument("--sync", action="store_true",
+                        help="先把草稿同步到 content/ 再构建")
+    parser.add_argument("--out-dir", default=None,
+                        help="输出目录（默认 _site/）")
+    args = parser.parse_args(argv)
+
+    manifest = load_manifest(ROOT / "manifest.json")
+    if args.sync:
+        n = sync_content(manifest, ROOT)
+        print(f"已同步 {n} 个文件")
+    out_dir = build(manifest, ROOT, out_dir=args.out_dir)
+    print(f"构建完成 → {out_dir}")
+
+
+if __name__ == "__main__":
+    main()
