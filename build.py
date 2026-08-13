@@ -9,6 +9,7 @@
 """
 import json
 import re
+import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -112,3 +113,29 @@ def render_markdown_body(lines):
     flush_para()
     flush_lists()
     return "\n".join(out)
+
+
+def sync_content(manifest, root, draft_dir=None):
+    """按 manifest 把草稿拷入 content/。返回拷贝的文件数。
+
+    只拷贝 manifest 引用的源文件；.bak 等未收录文件天然被跳过。
+    """
+    root = Path(root)
+    if draft_dir is None:
+        draft_dir = (root / manifest["draft_dir"]).resolve()
+    draft_dir = Path(draft_dir)
+    count = 0
+    for group in ("chapters", "extras"):
+        for item in manifest[group]:
+            src = draft_dir / item["source"]
+            if not src.is_file():
+                raise FileNotFoundError(f"草稿缺失：{src}")
+            dst = root / "content" / group / f"{item['id']}.txt"
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(src, dst)
+            count += 1
+    src = draft_dir / manifest["settings_source"]
+    if not src.is_file():
+        raise FileNotFoundError(f"设定文档缺失：{src}")
+    shutil.copyfile(src, root / "content" / "settings.md")
+    return count + 1

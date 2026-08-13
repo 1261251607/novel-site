@@ -85,5 +85,37 @@ class TestMarkdown(unittest.TestCase):
         self.assertIn("<li>条目一<br>续行内容。</li>", html)
 
 
+class TestSync(unittest.TestCase):
+    def test_sync_copies_listed_sources(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            drafts = root / "drafts"
+            drafts.mkdir()
+            (drafts / "01.txt").write_text("甲", encoding="utf-8")
+            (drafts / "02.txt").write_text("乙", encoding="utf-8")
+            (drafts / "jing.txt").write_text("丙", encoding="utf-8")
+            (drafts / "settings.md").write_text("丁", encoding="utf-8")
+            # 未列入 manifest 的文件（含 .bak）不应被拷贝
+            (drafts / "03.txt.bak").write_text("忽略我", encoding="utf-8")
+            manifest = make_manifest()
+            count = build.sync_content(manifest, root, draft_dir=drafts)
+            self.assertEqual(count, 4)
+            self.assertEqual(
+                (root / "content/chapters/1-1.txt").read_text(encoding="utf-8"), "甲")
+            self.assertEqual(
+                (root / "content/extras/jing.txt").read_text(encoding="utf-8"), "丙")
+            self.assertEqual(
+                (root / "content/settings.md").read_text(encoding="utf-8"), "丁")
+            self.assertFalse((root / "content/chapters/03.txt.bak").exists())
+
+    def test_sync_raises_when_source_missing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "drafts").mkdir()
+            manifest = make_manifest()
+            with self.assertRaises(FileNotFoundError):
+                build.sync_content(manifest, root, draft_dir=root / "drafts")
+
+
 if __name__ == "__main__":
     unittest.main()
