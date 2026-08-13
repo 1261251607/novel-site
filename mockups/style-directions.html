@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>风格方向 · 克系小说站</title>
+<style>
+  :root { --bg:#1b1d20; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--bg); color:#e8e4da;
+    font-family:-apple-system,"PingFang SC","Hiragino Sans GB",sans-serif;
+    padding:40px 24px;
+  }
+  .page-title { font-size:22px; margin-bottom:6px; }
+  .page-sub { color:#8b857a; font-size:14px; margin-bottom:28px; }
+  .row { display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap; }
+  .card {
+    flex:1 1 320px; min-width:300px; max-width:400px;
+    background:#232528; border:1px solid #3a3d42; border-radius:10px;
+    padding:18px; margin-bottom:8px;
+  }
+  .card h2 { font-size:16px; margin-bottom:4px; letter-spacing:.5px; }
+  .card .note { color:#8b857a; font-size:12.5px; line-height:1.6; margin-bottom:14px; }
+  .screen {
+    background:#fff; border-radius:6px; overflow:hidden;
+    box-shadow:0 6px 24px rgba(0,0,0,.45);
+    font-family:"Songti SC","STSong","Noto Serif CJK SC",Georgia,serif;
+    height:560px; display:flex; flex-direction:column;
+  }
+
+  /* ============ A · 深渊暗黑 ============ */
+  .a { background:#0b0d10; color:#cfc8b8; }
+  .a .nav { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #23262b; }
+  .a .nav .logo { font-size:13px; letter-spacing:4px; color:#c9a96a; }
+  .a .nav .links { font-size:10.5px; color:#6d675c; display:flex; gap:12px; font-family:-apple-system,sans-serif; }
+  .a .hero { padding:34px 22px 26px; text-align:center; }
+  .a .hero .mark { width:1px; height:44px; background:linear-gradient(#c9a96a,transparent); margin:0 auto 18px; }
+  .a .hero h3 { font-size:21px; font-weight:600; letter-spacing:10px; text-indent:10px; color:#e6dfce; text-shadow:0 0 24px rgba(201,169,106,.35); }
+  .a .hero .tag { margin-top:14px; font-size:11.5px; color:#8d8574; line-height:1.8; }
+  .a .chapters { flex:1; padding:0 22px; }
+  .a .ch { display:flex; justify-content:space-between; align-items:baseline; padding:10px 0; border-bottom:1px dashed #1d2024; font-size:12px; }
+  .a .ch .no { color:#5a5242; font-size:10px; letter-spacing:2px; }
+  .a .ch .name { color:#b3ab99; }
+  .a .ch.extra .name { color:#c9a96a; }
+  .a .foot { text-align:center; font-size:9px; color:#3f3a30; letter-spacing:6px; padding:16px 0 18px; }
+
+  /* ============ B · 泛黄手稿 ============ */
+  .b { background:#e7dcc0; color:#33291a; background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(120,90,40,.10), transparent 60%),
+    radial-gradient(ellipse at 85% 90%, rgba(120,90,40,.12), transparent 55%);
+  }
+  .b .nav { display:flex; justify-content:space-between; align-items:center; padding:16px 20px 10px; border-bottom:1px solid #8a7a58; margin:0 14px; }
+  .b .nav .logo { font-size:13px; letter-spacing:5px; color:#5a4323; }
+  .b .nav .links { font-size:10.5px; color:#7d6b45; display:flex; gap:11px; }
+  .b .hero { padding:26px 26px 20px; text-align:center; position:relative; }
+  .b .seal { position:absolute; top:18px; right:24px; width:34px; height:34px; background:#8c2f2f; color:#e7dcc0; display:flex; align-items:center; justify-content:center; font-size:19px; transform:rotate(-6deg); opacity:.85; }
+  .b .hero h3 { writing-mode:vertical-rl; font-size:24px; font-weight:600; letter-spacing:8px; color:#3d2e15; margin:0 auto 8px; }
+  .b .hero .tag { font-size:11.5px; color:#6d5a36; line-height:1.8; font-style:italic; }
+  .b .chapters { flex:1; padding:0 30px; }
+  .b .ch { display:flex; justify-content:space-between; align-items:baseline; padding:9px 0; border-bottom:1px dotted #a08c62; font-size:12px; }
+  .b .ch .no { color:#8a7448; font-size:10px; }
+  .b .ch .name { color:#4c3a1c; }
+  .b .ch.extra .name { color:#8c2f2f; }
+  .b .foot { text-align:center; font-size:9px; color:#8a7448; letter-spacing:5px; padding:14px 0 16px; }
+
+  /* ============ C · 冷冽极简 ============ */
+  .c { background:#f7f4ee; color:#1c1c1c; }
+  .c .nav { display:flex; justify-content:space-between; align-items:center; padding:18px 26px; }
+  .c .nav .logo { font-size:12px; letter-spacing:6px; color:#1c1c1c; font-weight:700; }
+  .c .nav .links { font-size:10.5px; color:#8a8a8a; display:flex; gap:16px; }
+  .c .hero { padding:42px 30px 30px; text-align:center; }
+  .c .hero h3 { font-size:26px; font-weight:700; letter-spacing:14px; text-indent:14px; color:#141414; }
+  .c .hero .rule { width:56px; height:2px; background:#7d1f1f; margin:22px auto; }
+  .c .hero .tag { font-size:11.5px; color:#6b6b6b; line-height:1.9; }
+  .c .chapters { flex:1; padding:0 30px; }
+  .c .ch { display:flex; justify-content:space-between; align-items:baseline; padding:11px 0; border-bottom:1px solid #e4e0d6; font-size:12px; }
+  .c .ch .no { color:#b5b0a4; font-size:10px; letter-spacing:2px; }
+  .c .ch .name { color:#2b2b2b; }
+  .c .ch.extra .name { color:#7d1f1f; }
+  .c .foot { text-align:center; font-size:9px; color:#b5b0a4; letter-spacing:5px; padding:16px 0 18px; }
+</style>
+</head>
+<body>
+  <div class="page-title">三个视觉方向 · 选一个</div>
+  <p class="page-sub">在浏览器里看渲染效果。选好之后在终端回复 A / B / C（也可以说"某个方向但改动某处"）。书名未定，先用「书名未定」占位。</p>
+  <div class="row">
+
+    <div class="card">
+      <h2>A · 深渊暗黑</h2>
+      <p class="note">近黑的底色 + 暗金点缀，克苏鲁式的"深渊凝视"。像在黑暗里读一盏油灯下的书。现代感最强，适合深夜阅读模式。</p>
+      <div class="screen a">
+        <div class="nav"><span class="logo">书名未定</span><span class="links">目录 · 番外 · 设定 · 关于</span></div>
+        <div class="hero">
+          <div class="mark"></div>
+          <h3>书名未定</h3>
+          <p class="tag">神已死。位子是空的，有东西坐了上去。<br>一个考研失利的大学生，走进了门内的东晋。</p>
+        </div>
+        <div class="chapters">
+          <div class="ch"><span class="no">壹</span><span class="name">第一章 · 第一节</span></div>
+          <div class="ch"><span class="no">贰</span><span class="name">第一章 · 第二节</span></div>
+          <div class="ch"><span class="no">叁</span><span class="name">第一章 · 第三节</span></div>
+          <div class="ch extra"><span class="no">番外</span><span class="name">《井》</span></div>
+          <div class="ch extra"><span class="no">番外</span><span class="name">《石像》</span></div>
+        </div>
+        <div class="foot">香火是记你的账</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>B · 泛黄手稿</h2>
+      <p class="note">做旧纸面 + 朱砂印 + 竖排题名，像一份从门里带出来的手抄本。氛围最"克"，但纸面底色对长文阅读不如暗色护眼。</p>
+      <div class="screen b">
+        <div class="nav"><span class="logo">书名未定</span><span class="links">目录 · 番外 · 设定 · 关于</span></div>
+        <div class="hero">
+          <div class="seal">未</div>
+          <h3>书名未定</h3>
+          <p class="tag">神已死。位子是空的，有东西坐了上去。<br>—— 门内纪事 · 永昌二年</p>
+        </div>
+        <div class="chapters">
+          <div class="ch"><span class="no">第一回</span><span class="name">第一章 · 第一节</span></div>
+          <div class="ch"><span class="no">第二回</span><span class="name">第一章 · 第二节</span></div>
+          <div class="ch"><span class="no">第三回</span><span class="name">第一章 · 第三节</span></div>
+          <div class="ch extra"><span class="no">番外</span><span class="name">《井》</span></div>
+          <div class="ch extra"><span class="no">番外</span><span class="name">《石像》</span></div>
+        </div>
+        <div class="foot">看多了，祂要记住你的</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>C · 冷冽极简</h2>
+      <p class="note">大片留白 + 一线暗红，文学杂志式的克制。恐怖藏在细节里，气质最"高级"，但和克苏鲁的距离感也最远。</p>
+      <div class="screen c">
+        <div class="nav"><span class="logo">书名未定</span><span class="links">目录 · 番外 · 设定 · 关于</span></div>
+        <div class="hero">
+          <h3>书名未定</h3>
+          <div class="rule"></div>
+          <p class="tag">神已死。位子是空的，有东西坐了上去。</p>
+        </div>
+        <div class="chapters">
+          <div class="ch"><span class="no">01</span><span class="name">第一章 · 第一节</span></div>
+          <div class="ch"><span class="no">02</span><span class="name">第一章 · 第二节</span></div>
+          <div class="ch"><span class="no">03</span><span class="name">第一章 · 第三节</span></div>
+          <div class="ch extra"><span class="no">番外</span><span class="name">《井》</span></div>
+          <div class="ch extra"><span class="no">番外</span><span class="name">《石像》</span></div>
+        </div>
+        <div class="foot">他说，天是死的</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
