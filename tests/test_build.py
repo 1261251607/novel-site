@@ -52,5 +52,38 @@ class TestParseTxt(unittest.TestCase):
         self.assertEqual(build.parse_txt(""), [])
 
 
+class TestMarkdown(unittest.TestCase):
+    def test_sections_split_by_headings(self):
+        md = "# 标题\n\n## 一、某节\n\n正文一。\n\n## 二、另一节\n\n正文三。"
+        sections = build.parse_markdown_sections(md)
+        self.assertEqual([s["title"] for s in sections],
+                         ["标题", "一、某节", "二、另一节"])
+
+    def test_body_renders_heading_list_bold_quote(self):
+        html = build.render_markdown_body([
+            "### 小节",
+            "普通段落。",
+            "",
+            "- 条目一",
+            "- **加粗条目**",
+            "",
+            "1. 有序一",
+            "2. 有序二",
+            "",
+            "> 引用行",
+        ])
+        self.assertIn("<h3>小节</h3>", html)
+        self.assertIn("<p>普通段落。</p>", html)
+        self.assertIn("<li>条目一</li>", html)
+        self.assertIn("<li><strong>加粗条目</strong></li>", html)
+        self.assertIn("<ol>", html)
+        self.assertIn("<li>有序一</li>", html)
+        self.assertIn("<blockquote>引用行</blockquote>", html)
+
+    def test_list_item_continuation_line(self):
+        html = build.render_markdown_body(["- 条目一", "  续行内容。"])
+        self.assertIn("<li>条目一<br>续行内容。</li>", html)
+
+
 if __name__ == "__main__":
     unittest.main()
